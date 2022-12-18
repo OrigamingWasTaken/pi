@@ -4,6 +4,9 @@ import random
 import tkinter.font as TkFont
 from tkinter import *
 import os
+import time
+
+time.sleep(10)
 
 if os.environ.get('DISPLAY','') == '':
     print('no display found. Using :0.0')
