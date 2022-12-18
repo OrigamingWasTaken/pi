@@ -5,12 +5,18 @@ import tkinter.font as TkFont
 from tkinter import *
 import os
 
+if os.environ.get('DISPLAY','') == '':
+    print('no display found. Using :0.0')
+    os.environ.__setitem__('DISPLAY', ':0.0')
+
 file = pathlib.Path("./messages.txt")
 lines = file.open().read().split('\n')
 
 message = lines[random.randrange(0,len(lines))]
 
-colors = ["white", "red", "green", "blue", "cyan", "magenta"]
+r = lambda: random.randint(0,255)
+color = '#%02X%02X%02X' % (r(),r(),r())
+
 root = tk.Tk()
 root.configure(bg="white")
 root.title("Message of the Day")
@@ -22,7 +28,7 @@ screen_height = root.winfo_screenheight()
 # canvas = tk.Canvas(root, height=screen_height,width=screen_width,bg="black")
 
 # Create label
-l = Label(root, text = message,bg="black",fg=colors[random.randrange(0,5)], height=480,width=320)
+l = Label(root, text = message,bg="black",fg=color, height=480,width=320)
 l.config(font =("Courier", 40))
 l.pack()
 
