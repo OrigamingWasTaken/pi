@@ -20,14 +20,12 @@ dates = json.load(specialFile.open())
 
 message = lines[random.randrange(0,len(lines))]
 
-date = str(date.today())
+date = str(date.today())[5:]
 
 try:
     message = dates[date]
 except Exception:
     pass
-
-print(date)
 
 def random_color():
         rand = lambda: random.randint(1, 200)
