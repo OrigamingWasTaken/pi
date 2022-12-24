@@ -1,12 +1,12 @@
 import pathlib
 import tkinter as tk
 import random
-import tkinter.font as TkFont
+import tkinter.font as font
 from tkinter import *
 import os
 import time
-
-time.sleep(10)
+from datetime import date
+import json
 
 if os.environ.get('DISPLAY','') == '':
     print('no display found. Using :0.0')
@@ -15,27 +15,51 @@ if os.environ.get('DISPLAY','') == '':
 file = pathlib.Path("./messages.txt")
 lines = file.open().read().split('\n')
 
+specialFile = pathlib.Path("./special.json")
+dates = json.load(specialFile.open())
+
 message = lines[random.randrange(0,len(lines))]
 
+date = str(date.today())
+
+try:
+    message = dates[date]
+except Exception:
+    pass
+
+print(date)
+
+def random_color():
+        rand = lambda: random.randint(1, 200)
+        return '#%02X%02X%02X' % (rand(), rand(), rand())
+
 r = lambda: random.randint(0,255)
-color = '#%02X%02X%02X' % (r(),r(),r())
+color = random_color()
 
 root = tk.Tk()
 root.configure(bg="white")
 root.title("Message of the Day")
-#root.geometry("480x320")
 root.attributes("-fullscreen",True)
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
-# canvas = tk.Canvas(root, height=screen_height,width=screen_width,bg="black")
+Grid.columnconfigure(root, index=0, weight=1)
+Grid.rowconfigure(root, 0, weight=1)
 
-# Create label
-l = Label(root, text = message,bg="black",fg=color, height=480,width=320)
-l.config(font =("Courier", 40))
-l.pack()
+label = Label(root,text=message, bg="white",fg=color,wraplength=root.winfo_width())
+label.grid(row=0,column=0,sticky="nsew")
+label.pack(side="top", fill="both", expand=True)
 
-# frame = tk.Frame(root,bg="white")
-# frame.place(relwidth=0.8,relheight=0.8)
+def update_label_text(event):
+    # Get the width and height of the window
+    width = event.width
+    height = event.height
 
+    # Calculate the font size based on the width and height of the window
+    font_size = int(min(width, height) / 10)
+
+    # Update the font size of the label
+    label.config(font=("Helvetica", font_size),wraplength=width)
+
+root.bind("<Configure>", update_label_text)
 root.mainloop()
