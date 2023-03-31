@@ -27,37 +27,26 @@ def getMessage():
                 lines = b_lines
                 o_f.close()
         message = lines[0]
+    today = str(date.today())[5:]
+    try:
+        message = dates[today]
+    except Exception:
         del lines[0]
-    with open("./messages.txt","w+") as file:
-        file.writelines(lines)
+        with open("./messages.txt","w+") as file:
+            file.writelines(lines)
     return(message)
 
-today = str(date.today())[5:]
 
 #Check if today is a special date, if yes then display the correct message
-message = getMessage()
-try:
-    message = dates[date]
-except Exception:
-    pass
 
 #Make a random color for the text, that isn't too bright so it can be read on a white bg
 def random_color():
         rand = lambda: random.randint(1, 200)
         return '#%02X%02X%02X' % (rand(), rand(), rand())
 
-r = lambda: random.randint(0,255)
-color = random_color()
-
-#Print check for the above values
-
-print("The message is: " + message)
-print("The color is: " + color)
+print("Lets go!")
 
 while True:
-    latestDate = today
-    today = str(date.today())[5:]
-
     root = tk.Tk()
     root.configure(bg="white")
     root.title("Message of the Day")
@@ -68,7 +57,7 @@ while True:
     Grid.columnconfigure(root, index=0, weight=1)
     Grid.rowconfigure(root, 0, weight=1)
 
-    label = Label(root, text=message, bg="white", fg=color, wraplength=root.winfo_width())
+    label = Label(root, text="Loading...", bg="white", fg=random_color(), wraplength=root.winfo_width())
 
     # Position the image label and text label on top of each other using the place geometry manager
     label.place(x=0, y=0, relwidth=1, relheight=1)
@@ -93,7 +82,7 @@ while True:
 
     def update_message():
         today = datetime.date.today()
-        label.config(text=getMessage())
+        label.config(text=getMessage(),fg=random_color())
 
         tomorrow = today + datetime.timedelta(days=1)
         midnight = datetime.datetime.combine(tomorrow, datetime.time.min)
