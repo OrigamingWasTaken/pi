@@ -1,24 +1,15 @@
-import pathlib
+import pathlib, random, os, json, requests
 import tkinter as tk
-import random
-import tkinter.font as font
 from tkinter import *
-import os
-import time
 from datetime import date
-import json
-import glob
-from PIL import Image, ImageTk
 
 if os.environ.get('DISPLAY','') == '':
     print('no display found. Using :0.0')
     os.environ.__setitem__('DISPLAY', ':0.0')
 
-file = pathlib.Path("./messages.txt")
-lines = file.open().read().split('\n')
-
-specialFile = pathlib.Path("./special.json")
-dates = json.load(specialFile.open())
+lines = requests.get("https://raw.githubusercontent.com/OrigamingWasTaken/pi/master/remote/messages.txt").text.split('\n')
+dates = requests.get("https://raw.githubusercontent.com/OrigamingWasTaken/pi/master/remote/special.json").json()
+print(dates)
 
 message = lines[random.randrange(0,len(lines))]
 
@@ -48,12 +39,7 @@ Grid.rowconfigure(root, 0, weight=1)
 
 label = Label(root, text=message, bg="white", fg=color, wraplength=root.winfo_width())
 
-# Position the image label and text label on top of each other using the place geometry manager
 label.place(x=0, y=0, relwidth=1, relheight=1)
-
-# Resize the image using the Image.resize method
-
-# Update the image displayed by the image label
 
 # Add the widgets to the root window using the grid geometry manager
 label.grid(row=0,column=0,sticky="nsew")
