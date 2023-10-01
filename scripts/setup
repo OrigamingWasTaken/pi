@@ -79,12 +79,16 @@ WantedBy=multi-user.target
     echo "@xset -dpms" >> "$XINITRC_FILE"
 
     echo "Setup completed. Scheduled shutdown, reboot, and started display script service. Cursor is hidden, and screen won't enter sleep mode."
+
+    # Print a message and reboot in 5 seconds
+    echo "Rebooting in 5 seconds..."
+    sleep 5
+    sudo reboot
 }
 
 # Check if the script was invoked with "uninstall" argument
 if [ "$1" == "uninstall" ]; then
     uninstall_setup
-    echo "Reverted changes made by setup script and uninstalled unclutter."
 else
     perform_setup
 fi
