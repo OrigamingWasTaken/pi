@@ -63,6 +63,8 @@ Wants=graphical.target
 
 [Service]
 WorkingDirectory=/home/$CURRENT_USER/pi/   # Set the working directory
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/$CURRENT_USER/.Xauthority
 ExecStart=/bin/bash -c 'sleep 5 && /bin/bash $DISPLAY_SCRIPT & /usr/bin/unclutter -idle 0.1 -root'
 Restart=always
 User=$CURRENT_USER
