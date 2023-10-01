@@ -38,33 +38,35 @@ def getColor():
         return '#%02X%02X%02X' % (rand(), rand(), rand())
 
 # Create the window
-root = tk.Tk()
-root.configure(bg="white")
-root.title("Message of the Day")
-root.attributes("-fullscreen",True)
-screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()
-
-Grid.columnconfigure(root, index=0, weight=1)
-Grid.rowconfigure(root, 0, weight=1)
-
-label = Label(root, text=getMessage(), bg="white", fg=getColor(), wraplength=root.winfo_width())
-
-label.place(x=0, y=0, relwidth=1, relheight=1)
-
-# Add the widgets to the root window using the grid geometry manager
-label.grid(row=0,column=0,sticky="nsew")
-
-def update_label_text(event):
-    # Get the width and height of the window
+def update_canvas_text(event):
+    canvas.delete("text")  # Remove any existing text
     width = event.width
     height = event.height
 
-    # Calculate the font size based on the width and height of the window
-    font_size = int(min(width, height) / 10)
+    message = getMessage()
+    # Calculate the font size based on the canvas dimensions
+    font_size = min(width, height) // len(message) * 3  # Adjust as needed
 
-    # Update the font size of the label
-    label.config(font=("Helvetica", font_size),wraplength=width)
- 
-root.bind("<Configure>", update_label_text)
+    # Get the message and color
+    color = getColor()
+
+    # Draw the text on the Canvas (upside down)
+    canvas.create_text(
+        width / 2,
+        height / 2,
+        text=message,
+        font=("Helvetica", font_size),
+        fill=color,
+        angle=180  # Rotate the text by 180 degrees (upside down)
+    )
+
+root = tk.Tk()
+root.configure(bg="white")
+root.title("Message of the Day")
+root.attributes("-fullscreen", True)
+
+canvas = Canvas(root, bg="white", highlightthickness=0)
+canvas.pack(fill=tk.BOTH, expand=True)
+
+root.bind("<Configure>", update_canvas_text)
 root.mainloop()
