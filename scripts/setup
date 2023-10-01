@@ -62,7 +62,7 @@ After=graphical.target    # Wait for the graphical target
 Wants=graphical.target
 
 [Service]
-WorkingDirectory=/home/$CURRENT_USER/pi/   # Set the working directory
+WorkingDirectory=/home/$CURRENT_USER/pi/
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/$CURRENT_USER/.Xauthority
 ExecStart=/bin/bash -c 'sleep 5 && /bin/bash $DISPLAY_SCRIPT & /usr/bin/unclutter -idle 0.1 -root'
@@ -73,8 +73,11 @@ User=$CURRENT_USER
 WantedBy=multi-user.target
 "
     echo "$DISPLAY_SERVICE" | sudo tee "/etc/systemd/system/display_script.service" > /dev/null
+    
+    sudo systemctl daemon-reload
     sudo systemctl enable display_script.service
     sudo systemctl start display_script.service
+    sudo systemctl daemon-reload
 
     # Schedule the shutdown script to run at midnight
     (crontab -l -u $CURRENT_USER ; echo "0 0 * * * $SHUTDOWN_SCRIPT") | crontab -u $CURRENT_USER -
