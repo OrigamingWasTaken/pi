@@ -7,47 +7,84 @@ CURRENT_USER=$(whoami)
 SHUTDOWN_SCRIPT="/home/$CURRENT_USER/pi/scripts/shutdown_script.sh"
 REBOOT_SCRIPT="/home/$CURRENT_USER/pi/scripts/reboot_script.sh"
 DISPLAY_SCRIPT="/home/$CURRENT_USER/pi/display/display_script.sh"
+XINITRC_FILE="/home/$CURRENT_USER/.xinitrc"
 
-# Create a shutdown script
-echo "#!/bin/bash" > "$SHUTDOWN_SCRIPT"
-echo "sudo shutdown -h now" >> "$SHUTDOWN_SCRIPT"
-chmod +x "$SHUTDOWN_SCRIPT"
+# Function to uninstall the setup
+uninstall_setup() {
+    # Remove the shutdown and reboot scripts
+    rm -f "$SHUTDOWN_SCRIPT"
+    rm -f "$REBOOT_SCRIPT"
 
-# Create a reboot script
-echo "#!/bin/bash" > "$REBOOT_SCRIPT"
-echo "sudo reboot" >> "$REBOOT_SCRIPT"
-chmod +x "$REBOOT_SCRIPT"
+    # Remove the systemd service for the display script
+    sudo systemctl stop display_script.service
+    sudo systemctl disable display_script.service
+    rm -f "/etc/systemd/system/display_script.service"
 
-# Create a systemd service for the display script
-DISPLAY_SERVICE="[Unit]
+    # Remove scheduled tasks
+    crontab -l -u $CURRENT_USER | grep -v "$SHUTDOWN_SCRIPT" | crontab -u $CURRENT_USER -
+    crontab -l -u $CURRENT_USER | grep -v "$REBOOT_SCRIPT" | crontab -u $CURRENT_USER -
+
+    # Restore the cursor settings in .xinitrc
+    sed -i '/@xset s off/d' "$XINITRC_FILE"
+    sed -i '/@xset -dpms/d' "$XINITRC_FILE"
+
+    # Remove unclutter
+    sudo apt-get remove unclutter --purge -y
+    sudo apt-get autoremove -y
+
+    echo "Reverted changes made by setup script and uninstalled unclutter."
+}
+
+# Function to perform the setup
+perform_setup() {
+    # Install unclutter
+    sudo apt-get update
+    sudo apt-get install unclutter -y
+
+    # Create a shutdown script
+    echo "#!/bin/bash" > "$SHUTDOWN_SCRIPT"
+    echo "sudo shutdown -h now" >> "$SHUTDOWN_SCRIPT"
+    chmod +x "$SHUTDOWN_SCRIPT"
+
+    # Create a reboot script
+    echo "#!/bin/bash" > "$REBOOT_SCRIPT"
+    echo "sudo reboot" >> "$REBOOT_SCRIPT"
+    chmod +x "$REBOOT_SCRIPT"
+
+    # Create a systemd service for the display script with unclutter
+    DISPLAY_SERVICE="[Unit]
 Description=Display Script Service
 After=multi-user.target
 
 [Service]
-ExecStart=/bin/bash -c 'while true; do /bin/bash $DISPLAY_SCRIPT; sleep 1; done'
+ExecStart=/bin/bash -c '/bin/bash $DISPLAY_SCRIPT & /usr/bin/unclutter -idle 0.1 -root'
 Restart=always
 User=$CURRENT_USER
 
 [Install]
 WantedBy=multi-user.target
 "
-echo "$DISPLAY_SERVICE" | sudo tee /etc/systemd/system/display_script.service > /dev/null
-sudo systemctl enable display_script.service
-sudo systemctl start display_script.service
+    echo "$DISPLAY_SERVICE" | sudo tee "/etc/systemd/system/display_script.service" > /dev/null
+    sudo systemctl enable display_script.service
+    sudo systemctl start display_script.service
 
-# Schedule the shutdown script to run at midnight
-(crontab -l -u $CURRENT_USER ; echo "0 0 * * * $SHUTDOWN_SCRIPT") | crontab -u $CURRENT_USER -
+    # Schedule the shutdown script to run at midnight
+    (crontab -l -u $CURRENT_USER ; echo "0 0 * * * $SHUTDOWN_SCRIPT") | crontab -u $CURRENT_USER -
 
-# Schedule the reboot script to run at 9 AM
-(crontab -l -u $CURRENT_USER ; echo "0 9 * * * $REBOOT_SCRIPT") | crontab -u $CURRENT_USER -
+    # Schedule the reboot script to run at 9 AM
+    (crontab -l -u $CURRENT_USER ; echo "0 9 * * * $REBOOT_SCRIPT") | crontab -u $CURRENT_USER -
 
-# Hide the cursor
-echo "@xset s off" >> "/home/$CURRENT_USER/.xinitrc"
-echo "@xset -dpms" >> "/home/$CURRENT_USER/.xinitrc"
+    # Hide the cursor
+    echo "@xset s off" >> "$XINITRC_FILE"
+    echo "@xset -dpms" >> "$XINITRC_FILE"
 
-echo "Setup completed. Scheduled shutdown, reboot, and started display script service. Cursor is hidden, and screen won't enter sleep mode."
+    echo "Setup completed. Scheduled shutdown, reboot, and started display script service. Cursor is hidden, and screen won't enter sleep mode."
+}
 
-# Print a message and reboot in 5 seconds
-echo "Rebooting in 5 seconds..."
-sleep 5
-sudo reboot
+# Check if the script was invoked with "uninstall" argument
+if [ "$1" == "uninstall" ]; then
+    uninstall_setup
+    echo "Reverted changes made by setup script and uninstalled unclutter."
+else
+    perform_setup
+fi
