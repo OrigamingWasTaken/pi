@@ -15,8 +15,14 @@ def getMessage():
     if today in dates:
          return dates[today]
 
+    # Remove blank lines
+    with open("messages.txt", "r") as file:
+        lines = file.readlines()
+        non_blank_lines = [line for line in lines if line.strip() != ""]
+    with open("messages.txt", "w") as file:
+        file.writelines(non_blank_lines)
+
     messages = open("messages.txt","r").read().split("\n")
-    
     # If file is empty then restore the backup
     if messages == ['']:
         with open("messages.txt","w+") as a:
@@ -43,21 +49,25 @@ def update_canvas_text(event):
     width = event.width
     height = event.height
 
-    message = getMessage()
     # Calculate the font size based on the canvas dimensions
-    font_size = min(width, height) // len(message) * 3  # Adjust as needed
+    message = getMessage()
+    font_size = min(width, height) // len(message) * 7  # Adjust as needed
 
     # Get the message and color
     color = getColor()
 
-    # Draw the text on the Canvas (upside down)
+    # Draw the text on the Canvas (upside down) and wrap it on multiple lines
     canvas.create_text(
         width / 2,
         height / 2,
         text=message,
         font=("Helvetica", font_size),
         fill=color,
-        angle=180  # Rotate the text by 180 degrees (upside down)
+        angle=180,  # Rotate the text by 180 degrees (upside down)
+        anchor="center",  # Center the text
+        width=width - 40,  # Adjust as needed for text wrapping
+        justify="center",  # Center the text within the width
+        tags="text"
     )
 
 root = tk.Tk()
