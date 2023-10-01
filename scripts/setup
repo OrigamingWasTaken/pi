@@ -15,10 +15,13 @@ uninstall_setup() {
     rm -f "$SHUTDOWN_SCRIPT"
     rm -f "$REBOOT_SCRIPT"
 
-    # Remove the systemd service for the display script
+    # Stop the systemd service for the display script
     sudo systemctl stop display_script.service
     sudo systemctl disable display_script.service
-    rm -f "/etc/systemd/system/display_script.service"
+
+    # Prompt for password to remove the service file
+    echo "Please enter your password to remove the systemd service file:"
+    sudo rm -f "/etc/systemd/system/display_script.service"
 
     # Remove scheduled tasks
     crontab -l -u $CURRENT_USER | grep -v "$SHUTDOWN_SCRIPT" | crontab -u $CURRENT_USER -
@@ -81,7 +84,7 @@ WantedBy=multi-user.target
     echo "@xset s off" >> "$XINITRC_FILE"
     echo "@xset -dpms" >> "$XINITRC_FILE"
 
-    echo "Setup completed. Scheduled shutdown, reboot, and started display script service. Cursor is hidden, and screen won't enter sleep mode."
+    echo "Setup completed. Scheduled shutdown, reboot, and started display script service. Cursor is hidden, and the screen won't enter sleep mode."
 
     # Print a message and reboot in 5 seconds
     echo "Rebooting in 5 seconds..."
