@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Define the paths to your scripts
+SHUTDOWN_SCRIPT="/home/ori/pi/scripts/shutdown_script.sh"
+REBOOT_SCRIPT="/home/ori/pi/scripts/reboot_script.sh"
+DISPLAY_SCRIPT="/home/ori/pi/display/display_script.sh"
+
+# Create a shutdown script
+echo "#!/bin/bash" > "$SHUTDOWN_SCRIPT"
+echo "sudo shutdown -h now" >> "$SHUTDOWN_SCRIPT"
+chmod +x "$SHUTDOWN_SCRIPT"
+
+# Create a reboot script
+echo "#!/bin/bash" > "$REBOOT_SCRIPT"
+echo "sudo reboot" >> "$REBOOT_SCRIPT"
+chmod +x "$REBOOT_SCRIPT"
+
+# Create a systemd service for the display script
+DISPLAY_SERVICE="[Unit]
+Description=Display Script Service
+After=multi-user.target
+
+[Service]
+ExecStart=/bin/bash -c 'while true; do /bin/bash $DISPLAY_SCRIPT; sleep 1; done'
+Restart=always
+User=ori
+
+[Install]
+WantedBy=multi-user.target
+"
+echo "$DISPLAY_SERVICE" | sudo tee /etc/systemd/system/display_script.service > /dev/null
+sudo systemctl enable display_script.service
+sudo systemctl start display_script.service
+
+# Schedule the shutdown script to run at midnight
+(crontab -l -u ori ; echo "0 0 * * * $SHUTDOWN_SCRIPT") | crontab -u ori -
+
+# Schedule the reboot script to run at 9 AM
+(crontab -l -u ori ; echo "0 9 * * * $REBOOT_SCRIPT") | crontab -u ori -
+
+echo "Setup completed. Scheduled shutdown, reboot, and started display script service."
