@@ -6,7 +6,7 @@ CURRENT_USER=$(whoami)
 # Define the paths to your scripts
 SHUTDOWN_SCRIPT="/home/$CURRENT_USER/pi/scripts/shutdown_script.sh"
 REBOOT_SCRIPT="/home/$CURRENT_USER/pi/scripts/reboot_script.sh"
-DISPLAY_SCRIPT="/home/$CURRENT_USER/pi/display/display_script.sh"
+DISPLAY_SCRIPT="/home/$CURRENT_USER/pi/display"
 XINITRC_FILE="/home/$CURRENT_USER/.xinitrc"
 
 # Function to uninstall the setup
@@ -55,9 +55,12 @@ perform_setup() {
     DISPLAY_SERVICE="[Unit]
 Description=Display Script Service
 After=multi-user.target
+After=graphical.target    # Wait for the graphical target
+Wants=graphical.target
 
 [Service]
-ExecStart=/bin/bash -c '/bin/bash $DISPLAY_SCRIPT & /usr/bin/unclutter -idle 0.1 -root'
+WorkingDirectory=/home/$CURRENT_USER/pi/   # Set the working directory
+ExecStart=/bin/bash -c 'sleep 5 && /bin/bash $DISPLAY_SCRIPT/display_script.sh & /usr/bin/unclutter -idle 0.1 -root'
 Restart=always
 User=$CURRENT_USER
 
