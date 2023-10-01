@@ -91,7 +91,7 @@ WantedBy=multi-user.target
     echo "@xset -dpms" >> "$XINITRC_FILE"
 
     # Disable updates notification
-    sudo raspi-config nonint do_update 1
+    sudo sed -i 's/APT::Periodic::Update-Package-Lists "1";/APT::Periodic::Update-Package-Lists "0";/g' /etc/apt/apt.conf.d/10periodic
 
     echo "Setup completed. Scheduled shutdown, reboot, and started display script service. Cursor is hidden, and the screen won't enter sleep mode."
 
