@@ -90,9 +90,6 @@ WantedBy=multi-user.target
     echo "@xset s off" >> "$XINITRC_FILE"
     echo "@xset -dpms" >> "$XINITRC_FILE"
 
-    # Disable updates notification
-    sudo sed -i 's/APT::Periodic::Update-Package-Lists "1";/APT::Periodic::Update-Package-Lists "0";/g' /etc/apt/apt.conf.d/10periodic
-
     echo "Setup completed. Scheduled shutdown, reboot, and started display script service. Cursor is hidden, and the screen won't enter sleep mode."
 
     # Print a message and reboot in 5 seconds
