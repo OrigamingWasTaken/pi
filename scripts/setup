@@ -90,6 +90,9 @@ WantedBy=multi-user.target
     echo "@xset s off" >> "$XINITRC_FILE"
     echo "@xset -dpms" >> "$XINITRC_FILE"
 
+    # Disable updates notification
+    sudo raspi-config nonint do_update 1
+
     echo "Setup completed. Scheduled shutdown, reboot, and started display script service. Cursor is hidden, and the screen won't enter sleep mode."
 
     # Print a message and reboot in 5 seconds
