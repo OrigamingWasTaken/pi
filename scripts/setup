@@ -63,7 +63,7 @@ Wants=graphical.target
 
 [Service]
 WorkingDirectory=/home/$CURRENT_USER/pi/   # Set the working directory
-ExecStart=/bin/bash -c 'sleep 5 && /bin/bash $DISPLAY_SCRIPT/display_script.sh & /usr/bin/unclutter -idle 0.1 -root'
+ExecStart=/bin/bash -c 'sleep 5 && /bin/bash $DISPLAY_SCRIPT & /usr/bin/unclutter -idle 0.1 -root'
 Restart=always
 User=$CURRENT_USER
 
