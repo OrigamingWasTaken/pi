@@ -1,5 +1,6 @@
 # pi
 
-this is a simple motd program for a raspberry pi
+This is a simple motd program made in Python with Tkinter.
+Run `display.py` to use it.
 
-it was written for my grandma :)
+Note: The archive folder contains the old code before the refactor. I kept it because it still can be useful.

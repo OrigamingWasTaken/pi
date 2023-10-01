@@ -7,7 +7,8 @@ if os.environ.get('DISPLAY','') == '':
     print('no display found. Using :0.0')
     os.environ.__setitem__('DISPLAY', ':0.0')
 
-lines = requests.get("https://raw.githubusercontent.com/OrigamingWasTaken/pi/master/remote/messages.txt").text.split('\n')
+file = pathlib.Path("./messages.txt")
+lines = file.open().read().split('\n')
 dates = requests.get("https://raw.githubusercontent.com/OrigamingWasTaken/pi/master/remote/special.json").json()
 print(dates)
 
