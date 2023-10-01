@@ -1,9 +1,12 @@
 #!/bin/bash
 
+# Determine the current user
+CURRENT_USER=$(whoami)
+
 # Define the paths to your scripts
-SHUTDOWN_SCRIPT="/home/ori/pi/scripts/shutdown_script.sh"
-REBOOT_SCRIPT="/home/ori/pi/scripts/reboot_script.sh"
-DISPLAY_SCRIPT="/home/ori/pi/display/display_script.sh"
+SHUTDOWN_SCRIPT="/home/$CURRENT_USER/pi/scripts/shutdown_script.sh"
+REBOOT_SCRIPT="/home/$CURRENT_USER/pi/scripts/reboot_script.sh"
+DISPLAY_SCRIPT="/home/$CURRENT_USER/pi/display/display_script.sh"
 
 # Create a shutdown script
 echo "#!/bin/bash" > "$SHUTDOWN_SCRIPT"
@@ -23,7 +26,7 @@ After=multi-user.target
 [Service]
 ExecStart=/bin/bash -c 'while true; do /bin/bash $DISPLAY_SCRIPT; sleep 1; done'
 Restart=always
-User=ori
+User=$CURRENT_USER
 
 [Install]
 WantedBy=multi-user.target
@@ -33,9 +36,18 @@ sudo systemctl enable display_script.service
 sudo systemctl start display_script.service
 
 # Schedule the shutdown script to run at midnight
-(crontab -l -u ori ; echo "0 0 * * * $SHUTDOWN_SCRIPT") | crontab -u ori -
+(crontab -l -u $CURRENT_USER ; echo "0 0 * * * $SHUTDOWN_SCRIPT") | crontab -u $CURRENT_USER -
 
 # Schedule the reboot script to run at 9 AM
-(crontab -l -u ori ; echo "0 9 * * * $REBOOT_SCRIPT") | crontab -u ori -
+(crontab -l -u $CURRENT_USER ; echo "0 9 * * * $REBOOT_SCRIPT") | crontab -u $CURRENT_USER -
 
-echo "Setup completed. Scheduled shutdown, reboot, and started display script service."
+# Hide the cursor
+echo "@xset s off" >> "/home/$CURRENT_USER/.xinitrc"
+echo "@xset -dpms" >> "/home/$CURRENT_USER/.xinitrc"
+
+echo "Setup completed. Scheduled shutdown, reboot, and started display script service. Cursor is hidden, and screen won't enter sleep mode."
+
+# Print a message and reboot in 5 seconds
+echo "Rebooting in 5 seconds..."
+sleep 5
+sudo reboot
