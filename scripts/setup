@@ -22,6 +22,7 @@ uninstall_setup() {
     # Prompt for password to remove the service file
     echo "Please enter your password to remove the systemd service file:"
     sudo rm -f "/etc/systemd/system/display_script.service"
+    sudo systemctl daemon-reload
 
     # Remove scheduled tasks
     crontab -l -u $CURRENT_USER | grep -v "$SHUTDOWN_SCRIPT" | crontab -u $CURRENT_USER -
