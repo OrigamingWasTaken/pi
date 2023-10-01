@@ -50,7 +50,6 @@ def update_canvas_text(event):
     height = event.height
 
     # Calculate the font size based on the canvas dimensions
-    message = getMessage()
     font_size = min(width, height) // len(message) * 7  # Adjust as needed
 
     # Get the message and color
@@ -70,6 +69,7 @@ def update_canvas_text(event):
         tags="text"
     )
 
+message = getMessage()
 root = tk.Tk()
 root.configure(bg="white")
 root.title("Message of the Day")
