@@ -1,6 +1,6 @@
 # pi
 
-This is a simple motd program made in Python with Tkinter.
+This is a simple motd program made in Python with Tkinter. I made it as a gift for my grandma (so that's why you'll see personal messages in `messages.txt`)
 Run `./scripts/setup` to install.
 Run `./scripts/setup uninstall` to uninstall.
 
